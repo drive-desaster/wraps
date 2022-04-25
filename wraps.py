@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-def ask (question:str, default:bool=None) -> bool:
+def ask_yn (question:str, default:bool=None) -> bool:
     """
     A function to ask the user a Y/N question in the cli
     the value of default (if set) is return in case the user gives an empty answer
@@ -23,3 +23,21 @@ def ask (question:str, default:bool=None) -> bool:
             return False
         else:
             print('Input invalid')
+
+
+def ask_number(min_value:float, max_value:float, question:str="please enter a number") -> float:
+    """
+    ask the user for an number
+    ensures the input is a number within the given range
+    """
+    flag = True
+    while flag:
+        try:
+            userinput = float(input(question).replace(',','.'))
+            if (max_value < userinput or min_value > userinput):
+                raise Exception()
+            else:
+                flag = False
+        except:
+            print(F"please enter a number betwen {min_value} and {max_value}")
+    return userinput
