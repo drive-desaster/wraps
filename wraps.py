@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+import os
+
 def ask_yn (question:str, default:bool=None) -> bool:
     """
     A function to ask the user a Y/N question in the cli
@@ -41,3 +43,23 @@ def ask_number(min_value:float, max_value:float, question:str="please enter a nu
         except:
             print(F"please enter a number betwen {min_value} and {max_value}")
     return userinput
+
+def ask_path(question:str="please enter a Path", notvalid:str="you did not enter a valid path") -> str:
+    """
+    aks the user for a filepath
+    check if the filepath is valid and exists on the system
+    returns the filepath
+    """
+    flag = True
+    while flag:
+        try:
+            path = input(question)
+            if os.path.exists(path):
+                falg = False
+                return str(path)
+            else:
+                print(notvalid)
+                falg = True
+        except:
+            print(notvalid)
+            flag = False
