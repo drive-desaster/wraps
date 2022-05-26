@@ -63,3 +63,15 @@ def ask_path(question:str="please enter a Path", notvalid:str="you did not enter
         except:
             print(notvalid)
             flag = False
+
+def read_file(filepath:str) -> str:
+    """
+    open given path if it is a file
+    return content of file after closing it
+    """
+    if not os.path.isfile(filepath):
+        raise Exception("please ensure to use a valid filepath")
+    tmp_file = open(filepath, 'r')
+    tmp_content = tmp_file.read()
+    tmp_file.close()
+    return tmp_content
