@@ -80,8 +80,49 @@ def read_file(filepath:str) -> str:
     return content of file after closing it
     """
     if not os.path.isfile(filepath):
-        raise Exception("please ensure to use a valid filepath")
+        raise FileNotFoundError("please ensure to use a valid filepath")
     tmp_file = open(filepath, 'r')
     tmp_content = tmp_file.read()
     tmp_file.close()
     return tmp_content
+
+def write_file(filepath:str, content:str, append:bool=False, question_exists:str="this file already exists, do you want to overrite it?", alternativemethod:str="throw", encoding:str="UTF-8"):
+    """
+    writes content to file
+    if append is False, will ask user if file should be replaced -> if not, then thows error, appends or doesn't write at all depending on parameter (default is throw, valid options are: "throw", "append", "skip")
+    """
+    #raise error if supplied path is a directory
+    if os.path.exists and not os.path.isfile(filepath): 
+        raise IsADirectoryError(F"{filepath} is a Directory and not a file")
+    #check if the file exists and if it should be appendet to it
+    if os.path.isfile(filepath) and not append:
+        #overwrite file (after asking user for consent)
+        if ask_yn(question_exists):
+            file = open(filepath, 'wb')
+            if type(content) == bytes:
+                file.write(content)
+            else:
+                file.write(bytes(content, encoding))
+            file.close()
+        else:
+            match alternativemethod.lower().trim():
+                case "throw":
+                    raise FileExistsError("target file exists and it was requested to thow here")
+                case "append":
+                    #append content to file
+                    file = open(filepath, 'ab')
+                    if type(content) == bytes:
+                        file.write(content)
+                    else:
+                        file.write(bytes(content, encoding))
+                    file.close()
+                case "skip":
+                    print("not modifing the file, as requested")
+    else:
+        #append content to file (create if not exists)
+        file = open(filepath, 'ab')
+        if type(content) == bytes:
+            file.write(content)
+        else:
+            file.write(bytes(content, encoding))
+        file.close()
