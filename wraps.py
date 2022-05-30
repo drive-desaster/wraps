@@ -92,8 +92,8 @@ def write_file(filepath:str, content:str, append:bool=False, question_exists:str
     if append is False, will ask user if file should be replaced -> if not, then thows error, appends or doesn't write at all depending on parameter (default is throw, valid options are: "throw", "append", "skip")
     """
     #raise error if supplied path is a directory
-    if os.path.exists and not os.path.isfile(filepath): 
-        raise IsADirectoryError(F"{filepath} is a Directory and not a file")
+    if os.path.isdir(filepath): 
+        raise IsADirectoryError(F"{os.path.realpath(filepath)} is a Directory and not a file")
     #check if the file exists and if it should be appendet to it
     if os.path.isfile(filepath) and not append:
         #overwrite file (after asking user for consent)
