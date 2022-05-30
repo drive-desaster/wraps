@@ -46,7 +46,7 @@ def ask_number(min_value:float, max_value:float, question:str="please enter a nu
 
 def ask_path(question:str="please enter a Path", notvalid:str="you did not enter a valid path") -> str:
     """
-    aks the user for a filepath
+    aks the user for a path in the file system
     check if the filepath is valid and exists on the system
     returns the filepath
     """
@@ -63,6 +63,16 @@ def ask_path(question:str="please enter a Path", notvalid:str="you did not enter
         except:
             print(notvalid)
             flag = False
+
+def ask_filepath(question:str = "please enter a file path ", notvalid:str="the entered path is not a valid filepath") -> str:
+    """
+    ask the user for a valid filepath in the filesystem
+    returns the filepath
+    """
+    path = ""
+    while not os.path.isfile(path):
+        path = ask_path(question, notvalid)
+    return path
 
 def read_file(filepath:str) -> str:
     """
