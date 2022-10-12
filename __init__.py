@@ -2,12 +2,12 @@
 
 import os
 
-def ask_yn (question:str, default:bool=None) -> bool:
+def ask_yn (question:str, default:bool|None=None) -> bool:
     """
     A function to ask the user a Y/N question in the cli
     the value of default (if set) is return in case the user gives an empty answer
     """
-    if default != None and type(default) != bool:
+    if default != None and not isinstance(default, bool):
         raise Exception('the provided value was not None and not a boolean')
     answers = '[y/n]'
     if default == True:
@@ -74,22 +74,28 @@ def ask_filepath(question:str = "please enter a file path ", notvalid:str="the e
         path = ask_path(question, notvalid)
     return path
 
-def read_file(filepath:str) -> str:
+def read_file(filepath:str, encoding:None|str=None) -> str:
     """
     open given path if it is a file
+    if encoding is set read file using the encoding
     return content of file after closing it
     """
     if not os.path.isfile(filepath):
         raise FileNotFoundError("please ensure to use a valid filepath")
-    tmp_file = open(filepath, 'r')
-    tmp_content = tmp_file.read()
-    tmp_file.close()
-    return tmp_content
+    if encoding == None:
+        with open(filepath, 'r') as tmp_file:
+            content = tmp_file.read()
+    else:
+        with open(filepath, 'rb') as tmp_file:
+            tmp_content = tmp_file.read()
+            content = tmp_content.decode(encoding)
+    return content
 
-def write_file(filepath:str, content:str, append:bool=False, question_exists:str="this file already exists, do you want to overrite it?", alternativemethod:str="throw", encoding:str="UTF-8"):
+def write_file(filepath:str, content:str|bytes, append:bool=False, question_exists:str="this file already exists, do you want to overrite it?", alternativemethod:str="throw", encoding:None|str=None):
     """
     writes content to file
     if append is False, will ask user if file should be replaced -> if not, then thows error, appends or doesn't write at all depending on parameter (default is throw, valid options are: "throw", "append", "skip")
+    uses system default encoding if encoding is None
     """
     #raise error if supplied path is a directory
     if os.path.isdir(filepath): 
@@ -98,31 +104,42 @@ def write_file(filepath:str, content:str, append:bool=False, question_exists:str
     if os.path.isfile(filepath) and not append:
         #overwrite file (after asking user for consent)
         if ask_yn(question_exists):
-            file = open(filepath, 'wb')
-            if type(content) == bytes:
-                file.write(content)
+            if encoding == None and not isinstance(content, bytes):
+                with open(filepath, 'wb') as tmp_file:
+                    tmp_file.write(content)
             else:
-                file.write(bytes(content, encoding))
-            file.close()
-        else:
-            match alternativemethod.lower().trim():
-                case "throw":
-                    raise FileExistsError("target file exists and it was requested to thow here")
-                case "append":
-                    #append content to file
-                    file = open(filepath, 'ab')
-                    if type(content) == bytes:
-                        file.write(content)
+                with open(filepath, 'wb') as tmp_file
+                    if isinstance(content, bytes):
+                        tmp_file.write(content)
                     else:
-                        file.write(bytes(content, encoding))
-                    file.close()
-                case "skip":
-                    print("not modifing the file, as requested")
+                        tmp_file.write(bytes(content, encoding))
+        else:
+            if alternativemethod.lower().trim() == "throw":
+                raise FileExistsError("target file exists and it was requested to thow here")
+            elif alternativemethod.lower().trim() == "append":
+                #append content to file
+                if encoding == None and not isinstance(content, bytes):
+                    with open(filepath, 'a') as tmp_file:
+                        tmp_file.write(content)
+                else:
+                    with open(filepath, 'ab') as tmp_file
+                        if isinstance(content, bytes):
+                            tmp_file.write(content)
+                        else:
+                            tmp_file.write(bytes(content, encoding))
+            elif alternativemethod.lower().trim() == "skip":
+                print("not modifing the file, as requested")
+            else:
+                raise SyntaxWarning("alternativemethod should be \"throw\", \"append\" or \"skip\", not \"" + str(alternativemethod) + "\"")
     else:
         #append content to file (create if not exists)
-        file = open(filepath, 'ab')
-        if type(content) == bytes:
-            file.write(content)
+        if encoding == None and not isinstance(content, bytes):
+            with open(filepath, 'a') as tmp_file:
+                tmp_file.write(content)
         else:
-            file.write(bytes(content, encoding))
-        file.close()
+            with open(filepath, 'ab') as tmp_file:
+                if isinstance(content, bytes):
+                    tmp_file.write(content)
+                else:
+                    tmp_file.write(bytes(content, encoding))
+        
