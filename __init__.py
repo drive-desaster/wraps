@@ -108,7 +108,7 @@ def write_file(filepath:str, content:str|bytes, append:bool=False, question_exis
                 with open(filepath, 'wb') as tmp_file:
                     tmp_file.write(content)
             else:
-                with open(filepath, 'wb') as tmp_file
+                with open(filepath, 'wb') as tmp_file:
                     if isinstance(content, bytes):
                         tmp_file.write(content)
                     else:
@@ -122,7 +122,7 @@ def write_file(filepath:str, content:str|bytes, append:bool=False, question_exis
                     with open(filepath, 'a') as tmp_file:
                         tmp_file.write(content)
                 else:
-                    with open(filepath, 'ab') as tmp_file
+                    with open(filepath, 'ab') as tmp_file:
                         if isinstance(content, bytes):
                             tmp_file.write(content)
                         else:
